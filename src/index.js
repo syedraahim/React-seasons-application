@@ -1,12 +1,40 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import SeasonDisplay from './components/SeasonDisplay';
+import Spinner from './components/Spinner'
 
-ReactDOM.render(<App />, document.getElementById('root'));
+class App extends React.Component {
+    constructor(props){
+        super(props);
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-serviceWorker.unregister();
+        this.state = { 
+                lat : null,
+                errorMessage: null
+        };
+        
+         window.navigator.geolocation.getCurrentPosition(
+            position => this.setState({ lat : position.coords.latitude}),
+            err => this.setState({errorMessage : err.message})
+        );
+    }
+
+renderContent() {
+                if(this.state.lat){
+                    return <div><SeasonDisplay lat={this.state.lat} /></div>
+                }
+                else if(this.state.errorMessage){
+                   return <div>error: {this.state.errorMessage}</div>
+                }
+                else{
+                   return <Spinner message="Please accept location permission" />
+                } 
+}
+
+
+    render(){
+        return <div className="render-div">
+            {this.renderContent()};
+        </div>
+    }
+}
+ReactDOM.render(<App />,document.querySelector('#root'));
